@@ -96,11 +96,6 @@ int main()
     };
 
     // *************** MATRIX AND VERTEX STUFF ***************
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    std::cout << vec.x << vec.y << vec.z << std::endl;
 
 
     // *************** BUFFERS ***************
@@ -154,13 +149,10 @@ int main()
 
     // for magnifying and minifying operators
     // use nearest neighbor (8 bit), bilinear filtering (blur), and/or mipmaps
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-
-    // *************** IMAGE LOADING ***************
     stbi_set_flip_vertically_on_load(true);
-
     int width, height, numChannels;
     unsigned char *data = stbi_load(FILE_PATH(FP_ASSETS, container.jpg), &width, &height, &numChannels, 0);
     if (data)
@@ -178,13 +170,12 @@ int main()
     else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
     stbi_image_free(data); // frees the image from memory
 
-
     glGenTextures(1, &textureFace);
     glBindTexture(GL_TEXTURE_2D, textureFace);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     data = stbi_load(FILE_PATH(FP_ASSETS, awesomeface.png), &width, &height, &numChannels, 0);
@@ -220,20 +211,37 @@ int main()
             glClearColor(0, 0, 0, 1);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            int offsetLocation = glGetUniformLocation(shader1.programID, "offset");
-            shader1.use();
-            // glUniform1f(offsetLocation, myPOD.test);
-            glUniform3f(offsetLocation, myPoint.x, myPoint.y, myPoint.z);
-
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textureContainer);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, textureFace);
 
-            glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+            float time = glfwGetTime();
+
+            glm::mat4 trans1 = glm::mat4(1.0f);
+            trans1 = glm::translate(trans1, glm::vec3(0.5f, -0.5f, 0.0f));
+            trans1 = glm::rotate(trans1, time, glm::vec3(0.0f, 0.0f, 1.0f));
+
+            glm::mat4 trans2 = glm::mat4(1.0f);
+            trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+            trans2 = glm::scale(trans2, glm::vec3(sin(time), cos(time), 1.0f));
+
+
+            shader1.use();
+            // int transformLocation = glGetUniformLocation(shader1.programID, "transform");
+            // glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+            int offsetLocation = glGetUniformLocation(shader1.programID, "offset");
+            glUniform3f(offsetLocation, myPoint.x, myPoint.y, myPoint.z);
+
+
+            // glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
             glBindVertexArray(VAO);
-            // count here is the number of indices
+
+            shader1.setMat4("transform", trans1);
             glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            shader1.setMat4("transform", trans2);
+            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
             glBindVertexArray(0);
         }
 
@@ -241,6 +249,10 @@ int main()
         glfwSwapBuffers(myWin);
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
     return 0;
