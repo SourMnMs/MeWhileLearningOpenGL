@@ -82,13 +82,56 @@ int main()
      * ***********************************************************************************/
 
     // *************** vertices upon vertices upon vertices ***************
-    constexpr int vertexStride = 8*sizeof(float);
+    constexpr int vertexStride = 5*sizeof(float);
+    // std::vector<float> vertices = {
+    //     // positions            // colors               //texture coords
+    //     0.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f,       1.0f, 1.0f, // top right
+    //     0.5f, -0.5f, 0.0f,      0.0f, 1.0f, 0.0f,       1.0f, 0.0f, // bottom right
+    //     -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,       0.0f, 0.0f, // bottom left
+    //     -0.5f, 0.5f, 0.0f,      1.0f, 1.0f, 0.0f,       0.0f, 1.0f // top left
+    // };
     std::vector<float> vertices = {
-        // positions            // colors               //texture coords
-        0.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f,       1.0f, 1.0f, // top right
-        0.5f, -0.5f, 0.0f,      0.0f, 1.0f, 0.0f,       1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,       0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f,      1.0f, 1.0f, 0.0f,       0.0f, 1.0f // top left
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
     std::vector<unsigned int> indices = {
         0, 1, 2,
@@ -116,8 +159,8 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
 
     // *************** VERTEX ATTRIBUTES ***************
@@ -127,11 +170,11 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute is same as above, same stride, offset of 3 floats
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
+    // glEnableVertexAttribArray(1);
     // texture attribute, takes 2 floats, offset of 6 floats
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertexStride, (void*)(6*sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
 
 
     // *************** TEXTURE STUFF ***************
@@ -187,6 +230,16 @@ int main()
     else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
     stbi_image_free(data);
 
+    // *************** TRANSFORMATIONS ***************
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    // translate scene in reverse direction of where we want to move
+    viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
 
     // *************** OBJECT INITIALIZATION ***************
 
@@ -218,29 +271,19 @@ int main()
 
             float time = glfwGetTime();
 
-            glm::mat4 trans1 = glm::mat4(1.0f);
-            trans1 = glm::translate(trans1, glm::vec3(0.5f, -0.5f, 0.0f));
-            trans1 = glm::rotate(trans1, time, glm::vec3(0.0f, 0.0f, 1.0f));
+            modelMatrix = glm::rotate(modelMatrix, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-            glm::mat4 trans2 = glm::mat4(1.0f);
-            trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-            trans2 = glm::scale(trans2, glm::vec3(sin(time), cos(time), 1.0f));
-
-
+            shader1.setMat4("model", modelMatrix);
+            shader1.setMat4("view", viewMatrix);
+            shader1.setMat4("projection", projectionMatrix);
             shader1.use();
             // int transformLocation = glGetUniformLocation(shader1.programID, "transform");
             // glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
-            int offsetLocation = glGetUniformLocation(shader1.programID, "offset");
-            glUniform3f(offsetLocation, myPoint.x, myPoint.y, myPoint.z);
 
-
-            // glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
             glBindVertexArray(VAO);
 
-            shader1.setMat4("transform", trans1);
-            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-            shader1.setMat4("transform", trans2);
-            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
 
             glBindVertexArray(0);
         }
