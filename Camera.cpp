@@ -7,12 +7,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
+Camera::Camera(glm::vec3 pos, glm::vec3 up, float nYaw, float nPitch)
 {
     position = pos;
     worldUp = up;
-    this->yaw = yaw;
-    this->pitch = pitch;
+    yaw = nYaw;
+    pitch = nPitch;
     updateCameraVectors();
 }
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch)
@@ -25,9 +25,13 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 }
 
 // returns the view matrix from Euler Angles and the LookAt matrix
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 Camera::getViewMatrix()
 {
     return glm::lookAt(position, position+front, up);
+}
+void Camera::setCameraType(Type t)
+{
+    cameraType = t;
 }
 
 
@@ -46,11 +50,19 @@ void Camera::updateCameraVectors()
 
 
 // alter the ENUM to allow more inputs
-void Camera::ProcessKeyboard(Camera_Movement dir, float deltaTime)
+void Camera::ProcessKeyboard(Movement dir, float deltaTime)
 {
     float velocity = speed * deltaTime;
-    if (dir == FORWARD) position += front*velocity;
-    if (dir == BACKWARD) position -= front*velocity;
+
+    glm::vec3 newFront = front;
+    if (cameraType == FPS)
+    {
+        newFront = {cos(glm::radians(yaw)), 0.0, sin(glm::radians(yaw))};
+        newFront = glm::normalize(newFront);
+    }
+
+    if (dir == FORWARD) position += newFront*velocity;
+    if (dir == BACKWARD) position -= newFront*velocity;
     if (dir == LEFT) position -= right*velocity;
     if (dir == RIGHT) position += right*velocity;
 }

@@ -12,14 +12,17 @@
 class Camera
 {
 private:
-    enum Camera_Movement {FORWARD, BACKWARD, LEFT, RIGHT};
     void updateCameraVectors();
 
 public:
+    enum Movement {FORWARD, BACKWARD, LEFT, RIGHT};
+    enum Type {FPS, FLY};
+    Type cameraType = FLY;
+
     // camera Attributes
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
+    glm::vec3 position{0.0f, 0.0f, 0.0f};
+    glm::vec3 front{0.0f, 0.0f, -1.0f};
+    glm::vec3 up{0.0f, 1.0f, 0.0f};
     glm::vec3 right;
     glm::vec3 worldUp;
 
@@ -30,11 +33,13 @@ public:
     float sensitivity = 0.1f;
     float zoom = 45.0f;
 
-    Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch);
+    Camera(glm::vec3 pos, glm::vec3 up, float nYaw, float nPitch);
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-    glm::mat4 GetViewMatrix();
-    void ProcessKeyboard(Camera_Movement dir, float deltaTime);
+    glm::mat4 getViewMatrix();
+    void setCameraType(Type t);
+
+    void ProcessKeyboard(Movement dir, float deltaTime);
     void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
     void ProcessMouseScroll(float yOffset);
 };

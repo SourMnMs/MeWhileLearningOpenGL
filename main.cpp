@@ -7,6 +7,7 @@
 #include "utils/point/Point.h"
 #include "utils/color/Color.h"
 #include "Shader.h"
+#include "Camera.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -31,7 +32,7 @@
 
 // callbacks
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xPos, double yPos);
+void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn);
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
 
 // input management
@@ -39,19 +40,14 @@ void processInput(GLFWwindow* window);
 
 
 constexpr GLuint WIN_WIDTH = 729, WIN_HEIGHT = 729;
+
+Camera camera{glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f};
 float lastX = WIN_WIDTH / 2.0f;
 float lastY = WIN_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-float yaw = -90.0f; // -90.0 defaults to look down -z axis
-float pitch = 0.0f;
-float fov = 45.0f;
-
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-glm::vec3 cameraPos{0.0f, 0.0f, 3.0f};
-glm::vec3 cameraFront{0.0f, 0.0f, -1.0f};
-glm::vec3 cameraUp{0.0f, 1.0f, 0.0f};
 
 
 int main()
@@ -71,7 +67,7 @@ int main()
 
 
     // Create Window
-    GLFWwindow* myWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Watch Thing", NULL, NULL);
+    GLFWwindow* myWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Watch Thing", nullptr, nullptr);
     if (!myWin)
     {
         std::cout << "Failed to create window." << std::endl;
@@ -255,11 +251,12 @@ int main()
 
     // *************** OBJECT INITIALIZATION ***************
     Shader shader1{FILE_PATH(FP_SHADERS, vertShader.vert), FILE_PATH(FP_SHADERS, fragShader.frag)};
-    Point myPoint{};
 
     shader1.use();
     shader1.setInt("tex1", 0);
     shader1.setInt("tex2", 1);
+
+    camera.setCameraType(Camera::Type::FPS);
 
 
     /* *******************************************************************
@@ -289,19 +286,8 @@ int main()
             glBindTexture(GL_TEXTURE_2D, textureFace);
 
             // rendering
-            glm::vec3 direction {
-                cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-                glm::radians(pitch),
-                sin(glm::radians(yaw)) * cos(glm::radians(pitch))};
-            cameraFront = glm::normalize(direction);
-
-            glm::mat4 modelMatrix{1.0f};
-            glm::mat4 viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-            glm::mat4 projectionMatrix{1.0f};
-            // translate scene in reverse direction of where we want to move
-            // modelMatrix = glm::rotate(modelMatrix, time, glm::vec3(0.5f, 1.0f, 0.0f));
-            // viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
-            projectionMatrix = glm::perspective(glm::radians(fov), WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.zoom), WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
+            glm::mat4 viewMatrix = camera.getViewMatrix();
 
             shader1.use();
 
@@ -316,7 +302,7 @@ int main()
             // glDrawArrays(GL_TRIANGLES, 0, 36);
             for (int i = 0; i < 10; i++)
             {
-                modelMatrix = glm::mat4(1.0f);
+                glm::mat4 modelMatrix{1.0f};
                 modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
                 float angle = 20.0f*i;
                 if (i % 3 == 0) angle = currentFrame * 25.0f;
@@ -347,8 +333,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
-void mouse_callback(GLFWwindow *window, double xPos, double yPos)
+void mouse_callback(GLFWwindow *window, double xPosIn, double yPosIn)
 {
+    float xPos = static_cast<float>(xPosIn);
+    float yPos = static_cast<float>(yPosIn);
+
     if (firstMouse)
     {
         lastX = xPos;
@@ -361,20 +350,11 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos)
     lastX = xPos;
     lastY = yPos;
 
-    constexpr float sensitivity = 0.1f; // make this adjustable later
-    xOffset *= sensitivity;
-    yOffset *= sensitivity;
-    yaw += xOffset;
-    pitch += yOffset;
-
-    if (pitch > 89.0f) pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
+    camera.ProcessMouseMovement(xOffset, yOffset);
 }
 void scroll_callback(GLFWwindow *window, double xOffset, double yOffset)
 {
-    fov -= yOffset;
-    if (fov < 1.0f) fov = 1.0f;
-    if (fov > 45.0f) fov = 45.0f;
+    camera.ProcessMouseScroll(static_cast<float>(yOffset));
 }
 
 
@@ -385,20 +365,18 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
         std::cout << "Closing window" << std::endl;
     }
-
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         std::cout << "Pebble has his thinking cap!" << std::endl;
     }
 
-    float cameraSpeed = 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(Camera::Movement::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(Camera::Movement::BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(Camera::Movement::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(Camera::Movement::RIGHT, deltaTime);
     // glfwGetInputMode ???
 }
