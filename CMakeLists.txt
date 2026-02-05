@@ -15,6 +15,8 @@ add_executable(${PROJECT_NAME} main.cpp
         utils/color/Color.cpp
         utils/color/Color.h
         stb_image.cpp
+        Camera.cpp
+        Camera.h
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)
