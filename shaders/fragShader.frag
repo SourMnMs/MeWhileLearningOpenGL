@@ -2,15 +2,18 @@
 out vec4 FragColor;
 
 //in vec3 ourColor;
-in vec2 TexCoord;
+//in vec2 TexCoord;
+in float dist;
 
 uniform sampler2D tex1;
 uniform sampler2D tex2;
+uniform int maxDist = 25;
 
 void main()
 
 {
-   FragColor = mix(texture(tex1, TexCoord), texture(tex2, TexCoord), 0.2);
+//   FragColor = mix(texture(tex1, TexCoord), texture(tex2, TexCoord), 0.2);
+   FragColor = vec4(1.0, 1.0, 1.0, 1.0) - vec4(dist/maxDist, dist/maxDist, dist/maxDist, 0.0);
 //   FragColor = mix(texture(tex1, TexCoord), texture(tex2, vec2(1.0 - TexCoord.x, TexCoord.y)), 0.2);
 //   FragColor = mix(texture(tex1, TexCoord)*vec4(ourColor, 1.0), texture(tex2, TexCoord), sin(TexCoord.x));
 }

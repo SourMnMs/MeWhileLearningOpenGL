@@ -40,6 +40,7 @@ void processInput(GLFWwindow* window);
 
 
 constexpr GLuint WIN_WIDTH = 729, WIN_HEIGHT = 729;
+constexpr bool DO_TEXTURES = false;
 
 Camera camera{glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f};
 float lastX = WIN_WIDTH / 2.0f;
@@ -56,7 +57,6 @@ int main()
     // wayland libdecor is annoying af so we have to do this and set resizable false
     glfwInitHint(GLFW_WAYLAND_LIBDECOR, GLFW_WAYLAND_DISABLE_LIBDECOR);
 #endif
-
     // Initialize GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //this means the user needs at least glfw ver 3
@@ -97,55 +97,101 @@ int main()
      * ***********************************************************************************/
 
     // *************** vertices upon vertices upon vertices ***************
-    constexpr int vertexStride = 5*sizeof(float);
-    std::vector<float> vertices = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    // https://learnopengl.com/Advanced-OpenGL/Advanced-Data
+    std::vector<float> verticesSub = {
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f,
+        0.5f, -0.5f,  0.5f,
+        0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f, -0.5f,
+        0.5f,  0.5f,  0.5f,
+        0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f
     };
-    // std::vector<unsigned int> indices = {
-    //     0, 1, 2,
-    //     2, 3, 0
-    // };
-    glm::vec3 cubePositions[] = {
+    GLsizeiptr vertMemSize = verticesSub.size()*sizeof(float);
+
+    /*std::vector<float> texCoordsSub = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f
+    };
+    GLsizeiptr texCoordMemSize = texCoordsSub.size()*sizeof(float);
+    */
+
+    GLsizeiptr totalArrayMemSize = vertMemSize;
+
+    std::vector<glm::vec3> cubePositions = {
         glm::vec3( 0.0f,  0.0f,  0.0f),
         glm::vec3( 2.0f,  5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -158,7 +204,6 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
-
     // *************** BUFFERS ***************
 
     // vertex array object (VAO) is basically a whole scene, a lot is drawn on a vao
@@ -170,12 +215,16 @@ int main()
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    // bind the Vertex Array Object first
-    glBindVertexArray(VAO);
+    // ***** REMEMBER: WHEN USING glBufferSubData(), YOU NEED TO glBufferData(total_mem_size, NULL) FIRST *******
+    // *     glBufferData takes in 123123123 arrays, glBufferSubData puts them in glBufferData as 111222333     *
+    // ***** Thus, the offset in glVertexAttribPointer is the sum of the arrays before it ***********************
 
-    // then bind and set the vertex buffer(s) and the element buffer(s)
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalArrayMemSize, nullptr, GL_DYNAMIC_DRAW);
+    // glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertMemSize, verticesSub.data());
+    // glBufferSubData(GL_ARRAY_BUFFER, vertMemSize, texCoordMemSize, texCoordsSub.data());
 
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
@@ -185,68 +234,70 @@ int main()
 
     // position attribute is the first 3 (index, size)
     // you need to jump 6 float sizes to get to the next position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute is same as above, same stride, offset of 3 floats
     // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
     // glEnableVertexAttribArray(1);
-    // texture attribute, takes 2 floats, offset of 6 floats
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(1);
+    // texture attribute, takes 2 floats
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)vertMemSize);
+    // glEnableVertexAttribArray(1);
 
-
+    /*
     // *************** TEXTURE STUFF ***************
     unsigned int textureContainer, textureFace;
-    // how many textures do we want? where to store them (c uint array)?
-    glGenTextures(1, &textureContainer);
-    glBindTexture(GL_TEXTURE_2D, textureContainer);
-
-    // set s and t axis to the "clamp to border" behavior
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    // because clamp to border is used, need to set a color for the border
-    float borderColor[] = {0.19f, 0.20f, 0.32f, 1.0f};
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-    // for magnifying and minifying operators
-    // use nearest neighbor (8 bit), bilinear filtering (blur), and/or mipmaps
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_set_flip_vertically_on_load(true);
-    int width, height, numChannels;
-    unsigned char *data = stbi_load(FILE_PATH(FP_ASSETS, container.jpg), &width, &height, &numChannels, 0);
-    if (data)
     {
-        // texture target (doesn't affect other texture targets like 1D or 3D)
-        // mipmap level (base is 0)
-        // format to store texture (our image only has rgb vals)
-        // width+height (stored with stbi_load())
-        // legacy border stuff that should always be 0
-        // format and datatype of source image (rgb, chars/bytes),
-        // image data (output of stbi_load())
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D); // takes care of making the mipmap for us
-    }
-    else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
-    stbi_image_free(data); // frees the image from memory
+        // how many textures do we want? where to store them (c uint array)?
+        glGenTextures(1, &textureContainer);
+        glBindTexture(GL_TEXTURE_2D, textureContainer);
 
-    glGenTextures(1, &textureFace);
-    glBindTexture(GL_TEXTURE_2D, textureFace);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // set s and t axis to the "clamp to border" behavior
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        // because clamp to border is used, need to set a color for the border
+        float borderColor[] = {0.19f, 0.20f, 0.32f, 1.0f};
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-    data = stbi_load(FILE_PATH(FP_ASSETS, awesomeface.png), &width, &height, &numChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
-    stbi_image_free(data);
+        // for magnifying and minifying operators
+        // use nearest neighbor (8 bit), bilinear filtering (blur), and/or mipmaps
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_set_flip_vertically_on_load(true);
+        int width, height, numChannels;
+        unsigned char *data = stbi_load(FILE_PATH(FP_ASSETS, container.jpg), &width, &height, &numChannels, 0);
+        if (data)
+        {
+            // texture target (doesn't affect other texture targets like 1D or 3D)
+            // mipmap level (base is 0)
+            // format to store texture (our image only has rgb vals)
+            // width+height (stored with stbi_load())
+            // legacy border stuff that should always be 0
+            // format and datatype of source image (rgb, chars/bytes),
+            // image data (output of stbi_load())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D); // takes care of making the mipmap for us
+        }
+        else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
+        stbi_image_free(data); // frees the image from memory
+
+        glGenTextures(1, &textureFace);
+        glBindTexture(GL_TEXTURE_2D, textureFace);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        data = stbi_load(FILE_PATH(FP_ASSETS, awesomeface.png), &width, &height, &numChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
+        stbi_image_free(data);
+    } */
 
 
     // *************** OBJECT INITIALIZATION ***************
@@ -262,7 +313,7 @@ int main()
     /* *******************************************************************
      *                            RENDER LOOP                            *
      * ******************************************************************/
-    // IDEA: CLASS THAT HAS A LIST OF EVERY OBJECT
+    // TODO: CLASS THAT HAS A LIST OF EVERY OBJECT
     // THIS CLASS ALSO HAS A STREAM OF INPUTS
     // PEAK ENCAPSULATION
 
@@ -280,10 +331,10 @@ int main()
 
         {
             // textures
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textureContainer);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, textureFace);
+            // glActiveTexture(GL_TEXTURE0);
+            // glBindTexture(GL_TEXTURE_2D, textureContainer);
+            // glActiveTexture(GL_TEXTURE1);
+            // glBindTexture(GL_TEXTURE_2D, textureFace);
 
             // rendering
             glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.zoom), WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
@@ -300,7 +351,7 @@ int main()
             glBindVertexArray(VAO);
             // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
             // glDrawArrays(GL_TRIANGLES, 0, 36);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < cubePositions.size(); i++)
             {
                 glm::mat4 modelMatrix{1.0f};
                 modelMatrix = glm::translate(modelMatrix, cubePositions[i]);

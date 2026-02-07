@@ -14,6 +14,7 @@ class Camera
 private:
     void updateCameraVectors();
 
+
 public:
     enum Movement {FORWARD, BACKWARD, LEFT, RIGHT};
     enum Type {FPS, FLY};
@@ -31,7 +32,9 @@ public:
 
     float speed = 2.5f;
     float sensitivity = 0.1f;
-    float zoom = 45.0f;
+
+    float zoomMax = 60.0f;
+    float zoom = zoomMax;
 
     Camera(glm::vec3 pos, glm::vec3 up, float nYaw, float nPitch);
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
