@@ -17,6 +17,10 @@ add_executable(${PROJECT_NAME} main.cpp
         stb_image.cpp
         Camera.cpp
         Camera.h
+        Shapes/Shape.cpp
+        Shapes/Shape.h
+        bufferLog.cpp
+        bufferLog.h
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)

@@ -6,6 +6,7 @@
 
 #include "utils/point/Point.h"
 #include "utils/color/Color.h"
+#include "bufferLog.h"
 #include "Shader.h"
 #include "Camera.h"
 
@@ -18,7 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <string_view>
 #include <iostream>
 
 
@@ -98,50 +98,62 @@ int main()
 
     // *************** vertices upon vertices upon vertices ***************
     // https://learnopengl.com/Advanced-OpenGL/Advanced-Data
-    std::vector<float> verticesSub = {
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
+    std::vector<glm::vec3> verticesSub = {
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, 0.5f, -0.5f),
+        glm::vec3(0.5f, 0.5f, -0.5f),
+        glm::vec3(-0.5f, 0.5f, -0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f),
 
-        -0.5f, -0.5f,  0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
+        glm::vec3(-0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, -0.5f, 0.5f),
 
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
+        glm::vec3(-0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, -0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(-0.5f, -0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, 0.5f),
 
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
 
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
+        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, -0.5f),
+        glm::vec3(0.5f, -0.5f, 0.5f),
+        glm::vec3(0.5f, -0.5f, 0.5f),
+        glm::vec3(-0.5f, -0.5f, 0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f),
 
-        -0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f
+        glm::vec3(-0.5f, 0.5f, -0.5f),
+        glm::vec3(0.5f, 0.5f, -0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, 0.5f),
+        glm::vec3(-0.5f, 0.5f, -0.5f)
     };
-    GLsizeiptr vertMemSize = verticesSub.size()*sizeof(float);
+    GLsizeiptr vertMemSize = verticesSub.size()*sizeof(glm::vec3);
+    GLvoid* vertData = &verticesSub[0];
+
+    std::vector<unsigned int> indices = {
+        0, 1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 11,
+        12, 13, 14, 15, 16, 17,
+        18, 19, 20, 21, 22, 23,
+        24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35
+    };
+    GLsizeiptr indicesMemSize = indices.size()*sizeof(unsigned int);
+
 
     /*std::vector<float> texCoordsSub = {
         0.0f, 0.0f,
@@ -189,7 +201,6 @@ int main()
     GLsizeiptr texCoordMemSize = texCoordsSub.size()*sizeof(float);
     */
 
-    GLsizeiptr totalArrayMemSize = vertMemSize;
 
     std::vector<glm::vec3> cubePositions = {
         glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -203,38 +214,35 @@ int main()
         glm::vec3( 1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
+    const unsigned int numCubePositions = cubePositions.size();
+
 
     // *************** BUFFERS ***************
 
     // vertex array object (VAO) is basically a whole scene, a lot is drawn on a vao
-            // ^^^ think changing a tab in a menu would be changing a vao
     // vertex buffer object (VBO) keeps track of a bunch of vertices
     // element buffer object (EBO) uses indices to tell what vertices to draw in what order
-    unsigned int EBO, VBO, VAO;
+    unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glBindVertexArray(VAO);
 
     // ***** REMEMBER: WHEN USING glBufferSubData(), YOU NEED TO glBufferData(total_mem_size, NULL) FIRST *******
     // *     glBufferData takes in 123123123 arrays, glBufferSubData puts them in glBufferData as 111222333     *
     // ***** Thus, the offset in glVertexAttribPointer is the sum of the arrays before it ***********************
+    constexpr int OneMB = 1024 * 1024;
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, totalArrayMemSize, nullptr, GL_DYNAMIC_DRAW);
-    // glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, vertMemSize, verticesSub.data());
-    // glBufferSubData(GL_ARRAY_BUFFER, vertMemSize, texCoordMemSize, texCoordsSub.data());
+    bufferLog VBO = {GL_ARRAY_BUFFER, 4*OneMB, GL_DYNAMIC_DRAW};
+    VBO.bufferSubData(vertMemSize, &verticesSub[0]);
 
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    bufferLog EBO = {GL_ELEMENT_ARRAY_BUFFER, 2*OneMB, GL_DYNAMIC_DRAW};
+    EBO.bufferSubData(indicesMemSize, &indices[0]);
 
 
     // *************** VERTEX ATTRIBUTES ***************
 
     // position attribute is the first 3 (index, size)
     // you need to jump 6 float sizes to get to the next position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
     // color attribute is same as above, same stride, offset of 3 floats
     // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
@@ -303,11 +311,16 @@ int main()
     // *************** OBJECT INITIALIZATION ***************
     Shader shader1{FILE_PATH(FP_SHADERS, vertShader.vert), FILE_PATH(FP_SHADERS, fragShader.frag)};
 
-    shader1.use();
-    shader1.setInt("tex1", 0);
-    shader1.setInt("tex2", 1);
+    // shader1.use();
+    // shader1.setInt("tex1", 0);
+    // shader1.setInt("tex2", 1);
 
     camera.setCameraType(Camera::Type::FPS);
+
+
+    GLint testSize = 0;
+    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &testSize);
+    std::cout << "VBO size: " << testSize << std::endl;
 
 
     /* *******************************************************************
@@ -351,7 +364,8 @@ int main()
             glBindVertexArray(VAO);
             // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
             // glDrawArrays(GL_TRIANGLES, 0, 36);
-            for (int i = 0; i < cubePositions.size(); i++)
+
+            for (int i = 0; i < numCubePositions; i++)
             {
                 glm::mat4 modelMatrix{1.0f};
                 modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
@@ -360,7 +374,10 @@ int main()
                 modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
                 shader1.setMat4("model", modelMatrix);
 
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+                // this is actually drawing one cube because one cube has 36 vertices
+                // 36 vertices = 6 faces * 2 triangles * 3 vertices
+                // glDrawArrays(GL_TRIANGLES, 0, 36);
+                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
             }
             glBindVertexArray(0);
         }
@@ -371,8 +388,8 @@ int main()
     }
 
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO.buffer);
+    glDeleteBuffers(1, &EBO.buffer);
 
     glfwTerminate();
     return 0;

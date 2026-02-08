@@ -78,7 +78,7 @@ void Shader::use()
 }
 
 
-
+// Makes a shader of type [[GLenum]]
 unsigned int Shader::makeShader(GLenum type, auto source)
 {
     unsigned int newShader = glCreateShader(type);
