@@ -39,7 +39,7 @@ public:
     Camera(glm::vec3 pos, glm::vec3 up, float nYaw, float nPitch);
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
-    glm::mat4 getViewMatrix();
+    glm::mat4 getViewMatrix() const;
     void setCameraType(Type t);
 
     void ProcessKeyboard(Movement dir, float deltaTime);

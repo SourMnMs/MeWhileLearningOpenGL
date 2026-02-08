@@ -24,8 +24,8 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
     updateCameraVectors();
 }
 
-// returns the view matrix from Euler Angles and the LookAt matrix
-glm::mat4 Camera::getViewMatrix()
+/// returns the view matrix from Euler Angles and the LookAt matrix
+glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(position, position+front, up);
 }
@@ -35,7 +35,7 @@ void Camera::setCameraType(Type t)
 }
 
 
-// calculates front vector from updated Euler Angles
+/// calculates front vector from updated Euler Angles
 void Camera::updateCameraVectors()
 {
     // new front vector

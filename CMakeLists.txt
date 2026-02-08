@@ -10,10 +10,6 @@ add_executable(${PROJECT_NAME} main.cpp
         glad.c
         Shader.cpp
         Shader.h
-        utils/point/Point.cpp
-        utils/point/Point.h
-        utils/color/Color.cpp
-        utils/color/Color.h
         stb_image.cpp
         Camera.cpp
         Camera.h
@@ -21,6 +17,8 @@ add_executable(${PROJECT_NAME} main.cpp
         Shapes/Shape.h
         bufferLog.cpp
         bufferLog.h
+        utils/CoordinateSystem/CoordinateSystem.cpp
+        utils/CoordinateSystem/CoordinateSystem.h
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)

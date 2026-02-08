@@ -10,18 +10,21 @@
 #include <glad/glad.h>
 
 Shape::Shape(
-    std::vector<glm::vec3> &verts,
+    std::vector<glm::vec2> &verts,
     std::vector<unsigned int> &inds,
-    glm::vec4 color = {0.0, 0.0, 0.0, 1.0},
-    std::string id = "")
+    glm::vec4 color,
+    std::string id)
 {
-    vertices = verts;
+    const unsigned int n = verts.size();
+    for (int i = 0; i < n; i++)
+        vertices.push_back(glm::vec3(verts[i], 0.0));
     numVertices = vertices.size();
     indices = inds;
     numIndices = indices.size();
     this->color = color;
     identifier = id;
 }
+
 
 void Shape::render(Shader& shader)
 {
@@ -31,17 +34,18 @@ void Shape::render(Shader& shader)
     // 2d shape so only rotations around Z-axis
     modelMatrix = glm::rotate(modelMatrix, rotation, glm::vec3(0.0, 0.0, 1.0));
     shader.setMat4("model", modelMatrix);
-    glDrawArrays(GL_TRIANGLES, 0, numVertices);
+    // glDrawArrays(GL_TRIANGLES, 0, numVertices);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 
 void Shape::addToBuffer(bufferLog& VBO, bufferLog& EBO)
 {
     glBindBuffer(VBO.target, VBO.buffer);
-    VBO.bufferSubData(memSize(), &vertices[0]);
+    VBO.bufferSubData(memSize(), vertices.data()); // error
 
     glBindBuffer(EBO.target, EBO.buffer);
-    EBO.bufferSubData(indices.size()*sizeof(unsigned int), &indices[0]);
+    EBO.bufferSubData(indices.size()*sizeof(unsigned int), indices.data());
 }
 
 

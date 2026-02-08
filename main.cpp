@@ -4,9 +4,8 @@
  *****************************************/
 
 
-#include "utils/point/Point.h"
-#include "utils/color/Color.h"
 #include "bufferLog.h"
+#include "../Shapes/Shape.h"
 #include "Shader.h"
 #include "Camera.h"
 
@@ -98,13 +97,13 @@ int main()
 
     // *************** vertices upon vertices upon vertices ***************
     // https://learnopengl.com/Advanced-OpenGL/Advanced-Data
-    std::vector<glm::vec3> verticesSub = {
+    /*std::vector<glm::vec3> verticesSub = {
         glm::vec3(-0.5f, -0.5f, -0.5f),
         glm::vec3(0.5f, -0.5f, -0.5f),
         glm::vec3(0.5f, 0.5f, -0.5f),
         glm::vec3(0.5f, 0.5f, -0.5f),
         glm::vec3(-0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, -0.5f, -0.5f),
+        glm::vec3(-0.5f, -0.5f, -0.5f)
 
         glm::vec3(-0.5f, -0.5f, 0.5f),
         glm::vec3(0.5f, -0.5f, 0.5f),
@@ -142,17 +141,17 @@ int main()
         glm::vec3(-0.5f, 0.5f, -0.5f)
     };
     GLsizeiptr vertMemSize = verticesSub.size()*sizeof(glm::vec3);
-    GLvoid* vertData = &verticesSub[0];
+    GLvoid* vertData = &verticesSub[0]; */
 
-    std::vector<unsigned int> indices = {
-        0, 1, 2, 3, 4, 5,
-        6, 7, 8, 9, 10, 11,
-        12, 13, 14, 15, 16, 17,
-        18, 19, 20, 21, 22, 23,
-        24, 25, 26, 27, 28, 29,
-        30, 31, 32, 33, 34, 35
-    };
-    GLsizeiptr indicesMemSize = indices.size()*sizeof(unsigned int);
+    // std::vector<unsigned int> indices = {
+    //     0, 1, 2, 3, 4, 5,
+    //     6, 7, 8, 9, 10, 11,
+    //     12, 13, 14, 15, 16, 17,
+    //     18, 19, 20, 21, 22, 23,
+    //     24, 25, 26, 27, 28, 29,
+    //     30, 31, 32, 33, 34, 35
+    // };
+    // GLsizeiptr indicesMemSize = indices.size()*sizeof(unsigned int);
 
 
     /*std::vector<float> texCoordsSub = {
@@ -202,20 +201,30 @@ int main()
     */
 
 
-    std::vector<glm::vec3> cubePositions = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
+    // std::vector<glm::vec3> cubePositions = {
+    //     glm::vec3( 0.0f,  0.0f,  0.0f),
+    //     glm::vec3( 2.0f,  5.0f, -15.0f),
+    //     glm::vec3(-1.5f, -2.2f, -2.5f),
+    //     glm::vec3(-3.8f, -2.0f, -12.3f),
+    //     glm::vec3( 2.4f, -0.4f, -3.5f),
+    //     glm::vec3(-1.7f,  3.0f, -7.5f),
+    //     glm::vec3( 1.3f, -2.0f, -2.5f),
+    //     glm::vec3( 1.5f,  2.0f, -2.5f),
+    //     glm::vec3( 1.5f,  0.2f, -1.5f),
+    //     glm::vec3(-1.3f,  1.0f, -1.5f)
+    // };
+    // const unsigned int numCubePositions = cubePositions.size();
+    std::vector<glm::vec2> shapeVerts = {
+        glm::vec2(-0.5f, -0.5f),    // bottom left
+        glm::vec2(-0.5f, 0.5f),     // top left
+        glm::vec2(0.5f, 0.5f),      // top right
+        glm::vec2(0.5f, -0.5f)      // bottom right
     };
-    const unsigned int numCubePositions = cubePositions.size();
-
+    std::vector<unsigned int> shapeInds = {
+        0, 1, 2,
+        2, 3, 0
+    };
+    Shape testShape{shapeVerts, shapeInds};
 
     // *************** BUFFERS ***************
 
@@ -232,10 +241,12 @@ int main()
     constexpr int OneMB = 1024 * 1024;
 
     bufferLog VBO = {GL_ARRAY_BUFFER, 4*OneMB, GL_DYNAMIC_DRAW};
-    VBO.bufferSubData(vertMemSize, &verticesSub[0]);
+    // VBO.bufferSubData(vertMemSize, &verticesSub[0]);
 
     bufferLog EBO = {GL_ELEMENT_ARRAY_BUFFER, 2*OneMB, GL_DYNAMIC_DRAW};
-    EBO.bufferSubData(indicesMemSize, &indices[0]);
+    // EBO.bufferSubData(indicesMemSize, &indices[0]);
+
+    testShape.addToBuffer(VBO, EBO);
 
 
     // *************** VERTEX ATTRIBUTES ***************
@@ -362,9 +373,11 @@ int main()
             // glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
 
             glBindVertexArray(VAO);
+            testShape.render(shader1);
             // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
             // glDrawArrays(GL_TRIANGLES, 0, 36);
 
+            /*
             for (int i = 0; i < numCubePositions; i++)
             {
                 glm::mat4 modelMatrix{1.0f};
@@ -378,7 +391,7 @@ int main()
                 // 36 vertices = 6 faces * 2 triangles * 3 vertices
                 // glDrawArrays(GL_TRIANGLES, 0, 36);
                 glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-            }
+            }*/
             glBindVertexArray(0);
         }
 

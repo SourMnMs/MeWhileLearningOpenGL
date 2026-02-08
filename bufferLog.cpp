@@ -17,7 +17,7 @@ bufferLog::bufferLog(GLenum target, GLsizeiptr size, GLenum usage)
     this->target = target;
 }
 
-void bufferLog::bufferSubData(GLsizeiptr dataSize, const void *data)
+void bufferLog::bufferSubData(GLsizeiptr dataSize, void *data)
 {
     glBindBuffer(target, buffer);
     glBufferSubData(target, storedSize, dataSize, data);
