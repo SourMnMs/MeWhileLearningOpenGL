@@ -66,7 +66,7 @@ int main()
 
 
     // Create Window
-    GLFWwindow* myWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Watch Thing", nullptr, nullptr);
+    GLFWwindow* myWin = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Area Calculator", nullptr, nullptr);
     if (!myWin)
     {
         std::cout << "Failed to create window." << std::endl;
@@ -200,19 +200,6 @@ int main()
     GLsizeiptr texCoordMemSize = texCoordsSub.size()*sizeof(float);
     */
 
-
-    // std::vector<glm::vec3> cubePositions = {
-    //     glm::vec3( 0.0f,  0.0f,  0.0f),
-    //     glm::vec3( 2.0f,  5.0f, -15.0f),
-    //     glm::vec3(-1.5f, -2.2f, -2.5f),
-    //     glm::vec3(-3.8f, -2.0f, -12.3f),
-    //     glm::vec3( 2.4f, -0.4f, -3.5f),
-    //     glm::vec3(-1.7f,  3.0f, -7.5f),
-    //     glm::vec3( 1.3f, -2.0f, -2.5f),
-    //     glm::vec3( 1.5f,  2.0f, -2.5f),
-    //     glm::vec3( 1.5f,  0.2f, -1.5f),
-    //     glm::vec3(-1.3f,  1.0f, -1.5f)
-    // };
     // const unsigned int numCubePositions = cubePositions.size();
     std::vector<glm::vec2> shapeVerts = {
         glm::vec2(-0.5f, -0.5f),    // bottom left
@@ -235,9 +222,9 @@ int main()
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    // ***** REMEMBER: WHEN USING glBufferSubData(), YOU NEED TO glBufferData(total_mem_size, NULL) FIRST *******
-    // *     glBufferData takes in 123123123 arrays, glBufferSubData puts them in glBufferData as 111222333     *
-    // ***** Thus, the offset in glVertexAttribPointer is the sum of the arrays before it ***********************
+    /***** REMEMBER: WHEN USING glBufferSubData(), YOU NEED TO glBufferData(total_mem_size, NULL) FIRST *******
+     *     glBufferData takes in 123123123 arrays, glBufferSubData puts them in glBufferData as 111222333     *
+     ***** Thus, the offset in glVertexAttribPointer is the sum of the arrays before it **********************/
     constexpr int OneMB = 1024 * 1024;
 
     bufferLog VBO = {GL_ARRAY_BUFFER, 4*OneMB, GL_DYNAMIC_DRAW};
@@ -253,11 +240,11 @@ int main()
 
     // position attribute is the first 3 (index, size)
     // you need to jump 6 float sizes to get to the next position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)VBO.memToAttrib(0));
     glEnableVertexAttribArray(0);
     // color attribute is same as above, same stride, offset of 3 floats
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexStride, (void*)(3*sizeof(float)));
-    // glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)VBO.memToAttrib(1));
+    glEnableVertexAttribArray(1);
     // texture attribute, takes 2 floats
     // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)vertMemSize);
     // glEnableVertexAttribArray(1);
@@ -373,25 +360,15 @@ int main()
             // glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
 
             glBindVertexArray(VAO);
+
+            testShape.translateDefault(222);
             testShape.render(shader1);
-            // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-            // glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            /*
-            for (int i = 0; i < numCubePositions; i++)
-            {
-                glm::mat4 modelMatrix{1.0f};
-                modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
-                float angle = 20.0f*i;
-                if (i % 3 == 0) angle = currentFrame * 25.0f;
-                modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                shader1.setMat4("model", modelMatrix);
-
-                // this is actually drawing one cube because one cube has 36 vertices
-                // 36 vertices = 6 faces * 2 triangles * 3 vertices
-                // glDrawArrays(GL_TRIANGLES, 0, 36);
-                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-            }*/
+            // testShape.setTranslation({1.0, 1.0}, 90.0f);
+            testShape.translate({1.0f, 1.0f});
+            testShape.rotate(glm::degrees(currentFrame));
+            testShape.scale({2.0f, 1.0f});
+            testShape.render(shader1);
             glBindVertexArray(0);
         }
 
@@ -401,8 +378,8 @@ int main()
     }
 
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO.buffer);
-    glDeleteBuffers(1, &EBO.buffer);
+    VBO.deleteBuffer();
+    EBO.deleteBuffer();
 
     glfwTerminate();
     return 0;

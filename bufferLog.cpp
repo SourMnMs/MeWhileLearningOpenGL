@@ -19,7 +19,20 @@ bufferLog::bufferLog(GLenum target, GLsizeiptr size, GLenum usage)
 
 void bufferLog::bufferSubData(GLsizeiptr dataSize, void *data)
 {
+    memLocs.push_back(totalStoredSize);
     glBindBuffer(target, buffer);
-    glBufferSubData(target, storedSize, dataSize, data);
-    storedSize += dataSize;
+    glBufferSubData(target, totalStoredSize, dataSize, data);
+    totalStoredSize += dataSize;
+}
+
+GLsizeiptr bufferLog::memToAttrib(int idx)
+{
+    return memLocs[idx];
+}
+
+void bufferLog::deleteBuffer()
+{
+    glDeleteBuffers(1, &buffer);
+    memLocs = {};
+    totalStoredSize = 0;
 }
