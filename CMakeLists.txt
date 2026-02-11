@@ -4,6 +4,8 @@ project(FirstOpenGLProj)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenGL REQUIRED)
+
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/include/modules")
 find_package(glfw3 REQUIRED)
 
 add_executable(${PROJECT_NAME} main.cpp
