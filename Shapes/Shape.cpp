@@ -36,7 +36,7 @@ void Shape::addToBuffer(bufferLog& VBO, bufferLog& EBO)
     // add colors to vbo
     // note: buffer will look like 111222333111122223333 because of this
     // but so long as we set offsets correctly the glVertexAttribPointer
-    // thing will still work.
+    // thing will still work. test
     std::vector<glm::vec4> colorVec = {};
     for (int i = 0; i < numVertices; i++) colorVec.push_back(color);
     VBO.bufferSubData(numVertices*sizeof(glm::vec4), colorVec.data());
