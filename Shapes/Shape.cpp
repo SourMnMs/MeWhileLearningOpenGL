@@ -10,6 +10,7 @@
 #include <glad/glad.h>
 
 #include <vector>
+#include <iostream>
 
 Shape::Shape(
     std::vector<glm::vec2> &verts,
@@ -19,7 +20,7 @@ Shape::Shape(
 {
     numVertices = verts.size();
     for (int i = 0; i < numVertices; i++)
-        vertices.push_back(glm::vec3(verts[i], 0.0));
+        vertices.emplace_back(verts[i], 0.0);
     indices = inds;
     numIndices = indices.size();
     this->color = color;
@@ -27,23 +28,32 @@ Shape::Shape(
 }
 
 
-void Shape::addToBuffer(bufferLog& VBO, bufferLog& EBO)
+void Shape::addVertsToBuffer(bufferLog &VBO, bufferLog &CBO)
 {
+    // VBO.startNewBlock();
     // add vertices to vbo
     glBindBuffer(VBO.target, VBO.buffer);
-    VBO.bufferSubData(memSize(), vertices.data());
+    VBO.bufferSubData(vertsMemSize(), vertices.data());
 
-    // add colors to vbo
-    // note: buffer will look like 111222333111122223333 because of this
-    // but so long as we set offsets correctly the glVertexAttribPointer
-    // thing will still work. test
+
+    // CBO.startNewBlock();
+    glBindBuffer(CBO.target, CBO.buffer);
+    // add colors to cbo
     std::vector<glm::vec4> colorVec = {};
     for (int i = 0; i < numVertices; i++) colorVec.push_back(color);
-    VBO.bufferSubData(numVertices*sizeof(glm::vec4), colorVec.data());
+    CBO.bufferSubData(numVertices*sizeof(glm::vec4), colorVec.data());
+}
 
-    // add indices to ebo
+void Shape::addIndsToBuffer(bufferLog &EBO, unsigned int offset)
+{
     glBindBuffer(EBO.target, EBO.buffer);
-    EBO.bufferSubData(indices.size()*sizeof(unsigned int), indices.data());
+    indicesMemOffset = EBO.currentStoredSize();
+
+    std::cout << "offset: " << offset << std::endl;
+    std::vector<unsigned int> modInds = {};
+    for (int i = 0; i < numIndices; i++) modInds.push_back(indices[i]+offset);
+
+    EBO.bufferSubData(numIndices*sizeof(unsigned int), modInds.data());
 }
 
 
@@ -52,20 +62,23 @@ void Shape::render(Shader& shader)
     // remember that there only needs to be one shader.use() call
     glm::mat4 modelMatrix = {1.0f};
     modelMatrix = glm::translate(modelMatrix, glm::vec3(translation, 0.0f));
-    // 2d shape so only rotations around Z-axis
-    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation), glm::vec3(0.0, 0.0, 1.0));
+    // 2d shape so only rotations around Z-axis (0.0, 0.0, 1.0)
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
     modelMatrix = glm::scale(modelMatrix, {scaleFactor, 1.0f});
     shader.setMat4("model", modelMatrix);
     // glDrawArrays(GL_TRIANGLES, 0, numVertices);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, (void*)indicesMemOffset);
 }
 
 
-GLsizeiptr Shape::memSize() const
+GLsizeiptr Shape::vertsMemSize() const
 {
     return numVertices * sizeof(glm::vec3);
 }
-
+int Shape::numVerts()
+{
+    return numVertices;
+}
 
 void Shape::setTranslations(glm::vec2 transl, float rot, glm::vec2 fscale)
 {

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.15)
 project(FirstOpenGLProj)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -25,6 +25,11 @@ add_executable(${PROJECT_NAME} main.cpp
         bufferLog.h
         utils/CoordinateSystem/CoordinateSystem.cpp
         utils/CoordinateSystem/CoordinateSystem.h
+        Shapes/ShapeTypes.h
+        Shapes/RegPolygon.cpp
+        Shapes/RegPolygon.h
+        RenderQueue.cpp
+        RenderQueue.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)

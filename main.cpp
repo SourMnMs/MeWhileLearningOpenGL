@@ -4,8 +4,9 @@
  *****************************************/
 
 
+#include "Shapes/ShapeTypes.h"
+#include "RenderQueue.h"
 #include "bufferLog.h"
-#include "../Shapes/Shape.h"
 #include "Shader.h"
 #include "Camera.h"
 
@@ -61,8 +62,10 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //this means the user needs at least glfw ver 3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); //^^^ but at least ver 3.3
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHintString(GLFW_WAYLAND_APP_ID, "SourMnMs-OpenGL-Proj");
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+#ifdef __linux__
+    glfwWindowHintString(GLFW_WAYLAND_APP_ID, "SourMnMs-OpenGL-Proj");
+#endif
 
 
     // Create Window
@@ -97,114 +100,12 @@ int main()
 
     // *************** vertices upon vertices upon vertices ***************
     // https://learnopengl.com/Advanced-OpenGL/Advanced-Data
-    /*std::vector<glm::vec3> verticesSub = {
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, 0.5f, -0.5f),
-        glm::vec3(0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, -0.5f, -0.5f)
-
-        glm::vec3(-0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, -0.5f, 0.5f),
-
-        glm::vec3(-0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-        glm::vec3(-0.5f, -0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, 0.5f),
-
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, -0.5f),
-        glm::vec3(0.5f, -0.5f, 0.5f),
-        glm::vec3(0.5f, -0.5f, 0.5f),
-        glm::vec3(-0.5f, -0.5f, 0.5f),
-        glm::vec3(-0.5f, -0.5f, -0.5f),
-
-        glm::vec3(-0.5f, 0.5f, -0.5f),
-        glm::vec3(0.5f, 0.5f, -0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, 0.5f),
-        glm::vec3(-0.5f, 0.5f, -0.5f)
-    };
-    GLsizeiptr vertMemSize = verticesSub.size()*sizeof(glm::vec3);
-    GLvoid* vertData = &verticesSub[0]; */
-
-    // std::vector<unsigned int> indices = {
-    //     0, 1, 2, 3, 4, 5,
-    //     6, 7, 8, 9, 10, 11,
-    //     12, 13, 14, 15, 16, 17,
-    //     18, 19, 20, 21, 22, 23,
-    //     24, 25, 26, 27, 28, 29,
-    //     30, 31, 32, 33, 34, 35
-    // };
-    // GLsizeiptr indicesMemSize = indices.size()*sizeof(unsigned int);
 
 
-    /*std::vector<float> texCoordsSub = {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f
-    };
-    GLsizeiptr texCoordMemSize = texCoordsSub.size()*sizeof(float);
-    */
-
-    // const unsigned int numCubePositions = cubePositions.size();
     std::vector<glm::vec2> shapeVerts = {
         glm::vec2(-0.5f, -0.5f),    // bottom left
         glm::vec2(-0.5f, 0.5f),     // top left
-        glm::vec2(0.5f, 0.5f),      // top right
+        glm::vec2(1.5f, 0.5f),      // top right
         glm::vec2(0.5f, -0.5f)      // bottom right
     };
     std::vector<unsigned int> shapeInds = {
@@ -212,6 +113,9 @@ int main()
         2, 3, 0
     };
     Shape testShape{shapeVerts, shapeInds};
+
+    RegPolygon circle1{16, 1.0f, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)};
+    RegPolygon circle2{7, 0.5f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)};
 
     // *************** BUFFERS ***************
 
@@ -227,84 +131,37 @@ int main()
      ***** Thus, the offset in glVertexAttribPointer is the sum of the arrays before it **********************/
     constexpr int OneMB = 1024 * 1024;
 
-    bufferLog VBO = {GL_ARRAY_BUFFER, 4*OneMB, GL_DYNAMIC_DRAW};
+    bufferLog VertexBO = {GL_ARRAY_BUFFER, 2*OneMB, GL_DYNAMIC_DRAW};
+    bufferLog ColorBO = {GL_ARRAY_BUFFER, 2*OneMB, GL_DYNAMIC_DRAW};
     // VBO.bufferSubData(vertMemSize, &verticesSub[0]);
 
     bufferLog EBO = {GL_ELEMENT_ARRAY_BUFFER, 2*OneMB, GL_DYNAMIC_DRAW};
     // EBO.bufferSubData(indicesMemSize, &indices[0]);
 
-    testShape.addToBuffer(VBO, EBO);
+    RenderQueue queue1(VertexBO, ColorBO, EBO);
+    queue1.addObject(&testShape);
+    queue1.addObject(&circle1);
+    queue1.addObject(&circle2);
+    queue1.bufferObjects();
+
+    testShape.setTranslation({-2.0f, -2.0f});
+    circle1.translateDefault(222);
+    circle2.setTranslation({1.0f, 1.0f});
 
 
     // *************** VERTEX ATTRIBUTES ***************
 
     // position attribute is the first 3 (index, size)
     // you need to jump 6 float sizes to get to the next position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)VBO.memToAttrib(0));
+    VertexBO.bind();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
+
+    ColorBO.bind();
     // color attribute is same as above, same stride, offset of 3 floats
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)VBO.memToAttrib(1));
+    // idea for future: since shapes are one color, make stride 0? (i.e. vertex:111222333+color:123 = 111222333123)
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);
     glEnableVertexAttribArray(1);
-    // texture attribute, takes 2 floats
-    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*)vertMemSize);
-    // glEnableVertexAttribArray(1);
-
-    /*
-    // *************** TEXTURE STUFF ***************
-    unsigned int textureContainer, textureFace;
-    {
-        // how many textures do we want? where to store them (c uint array)?
-        glGenTextures(1, &textureContainer);
-        glBindTexture(GL_TEXTURE_2D, textureContainer);
-
-        // set s and t axis to the "clamp to border" behavior
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        // because clamp to border is used, need to set a color for the border
-        float borderColor[] = {0.19f, 0.20f, 0.32f, 1.0f};
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-        // for magnifying and minifying operators
-        // use nearest neighbor (8 bit), bilinear filtering (blur), and/or mipmaps
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_set_flip_vertically_on_load(true);
-        int width, height, numChannels;
-        unsigned char *data = stbi_load(FILE_PATH(FP_ASSETS, container.jpg), &width, &height, &numChannels, 0);
-        if (data)
-        {
-            // texture target (doesn't affect other texture targets like 1D or 3D)
-            // mipmap level (base is 0)
-            // format to store texture (our image only has rgb vals)
-            // width+height (stored with stbi_load())
-            // legacy border stuff that should always be 0
-            // format and datatype of source image (rgb, chars/bytes),
-            // image data (output of stbi_load())
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D); // takes care of making the mipmap for us
-        }
-        else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
-        stbi_image_free(data); // frees the image from memory
-
-        glGenTextures(1, &textureFace);
-        glBindTexture(GL_TEXTURE_2D, textureFace);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        data = stbi_load(FILE_PATH(FP_ASSETS, awesomeface.png), &width, &height, &numChannels, 0);
-        if (data)
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else std::cout << "ERROR::IMAGE::LOADING_FAILED" << std::endl;
-        stbi_image_free(data);
-    } */
-
 
     // *************** OBJECT INITIALIZATION ***************
     Shader shader1{FILE_PATH(FP_SHADERS, vertShader.vert), FILE_PATH(FP_SHADERS, fragShader.frag)};
@@ -341,12 +198,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         {
-            // textures
-            // glActiveTexture(GL_TEXTURE0);
-            // glBindTexture(GL_TEXTURE_2D, textureContainer);
-            // glActiveTexture(GL_TEXTURE1);
-            // glBindTexture(GL_TEXTURE_2D, textureFace);
-
             // rendering
             glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.zoom), WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
             glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -361,14 +212,16 @@ int main()
 
             glBindVertexArray(VAO);
 
-            testShape.translateDefault(222);
-            testShape.render(shader1);
+            // testShape.setTranslation({-2.0f, -2.0f});
+            // testShape.render(shader1);
+            //
+            // circle1.translateDefault(222);
+            // circle1.render(shader1);
+            //
+            // circle2.setTranslation({1.0f, 1.0f});
+            // circle2.render(shader1);
+            queue1.renderObjects(shader1);
 
-            // testShape.setTranslation({1.0, 1.0}, 90.0f);
-            testShape.translate({1.0f, 1.0f});
-            testShape.rotate(glm::degrees(currentFrame));
-            testShape.scale({2.0f, 1.0f});
-            testShape.render(shader1);
             glBindVertexArray(0);
         }
 
@@ -378,7 +231,7 @@ int main()
     }
 
     glDeleteVertexArrays(1, &VAO);
-    VBO.deleteBuffer();
+    VertexBO.deleteBuffer();
     EBO.deleteBuffer();
 
     glfwTerminate();

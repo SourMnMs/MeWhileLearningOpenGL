@@ -6,6 +6,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 bufferLog::bufferLog(GLenum target, GLsizeiptr size, GLenum usage)
 {
@@ -19,20 +20,42 @@ bufferLog::bufferLog(GLenum target, GLsizeiptr size, GLenum usage)
 
 void bufferLog::bufferSubData(GLsizeiptr dataSize, void *data)
 {
-    memLocs.push_back(totalStoredSize);
+    // memBlocks.push_back(totalStoredSize);
+    // if (memBlocks.empty()) startNewBlock();
+    startNewBlock();
     glBindBuffer(target, buffer);
     glBufferSubData(target, totalStoredSize, dataSize, data);
     totalStoredSize += dataSize;
 }
 
-GLsizeiptr bufferLog::memToAttrib(int idx)
+void bufferLog::bind()
 {
-    return memLocs[idx];
+    glBindBuffer(target, buffer);
+}
+GLsizeiptr bufferLog::currentStoredSize()
+{
+    return totalStoredSize;
+}
+
+void bufferLog::startNewBlock()
+{
+    memBlocks.push_back(totalStoredSize);
+}
+
+GLsizeiptr bufferLog::memToBlock(int idx)
+{
+    if (memBlocks.empty()) return 0;
+    return memBlocks[idx];
+}
+GLsizeiptr bufferLog::memToBlock()
+{
+    if (memBlocks.empty()) return 0;
+    return memBlocks[memBlocks.size()-1];
 }
 
 void bufferLog::deleteBuffer()
 {
     glDeleteBuffers(1, &buffer);
-    memLocs = {};
+    memBlocks = {};
     totalStoredSize = 0;
 }
