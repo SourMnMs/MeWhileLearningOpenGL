@@ -9,6 +9,7 @@ The end goal is to have a working program that can calculate the area of any giv
 ## Be advised, **this currently only runs on Ubuntu**.
 
 To compile it, you need:
+ - OpenGL - ```sudo apt install libgl1-mesa-dev libglu1-mesa-dev```
  - libglfw3-dev - ```sudo apt-get install libglfw3-dev```
  - apple bottom jeans
  - boots with the fur (sold separately)
