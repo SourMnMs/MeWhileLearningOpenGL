@@ -8,16 +8,16 @@ The end goal is to have a working program that can calculate the area of a given
 
 ## Checklist (mostly for myself):
 
-- [x] ~~Make it through [LearnOpenGL.com](http://LearnOpenGL.com)’s “Getting Started” tutorials~~  
-      - [x] ~~Read through some of the other tutorials on there as well (not all of them because I’m making a 2D project)~~  
+- [x] Make it through [LearnOpenGL.com](http://LearnOpenGL.com)’s “Getting Started” tutorials
+  - [x] Read through some of the other tutorials on there as well (not all of them because I’m making a 2D project)
 - [ ] Make it easier to render shapes  
-      - [x] ~~Make generic shape class (and subclasses)~~  
-            - [x] ~~Regular polygon of n sides~~  
-            - [ ] Triangle  
-            - [ ] Rectangle  
-      - [x] ~~Make a handler to operate all of its given shapes~~  
-            - [x] ~~Buffer shapes~~  
-            - [x] ~~Render shapes~~  
-            - [ ] Input buffer  
+  - [x] Make generic shape class (and subclasses)
+    - [x] Regular polygon of n sides
+    - [ ] Triangle  
+    - [ ] Rectangle  
+  - [x] Make a handler to operate on all of its given shapes
+    - [x] Buffer shapes
+    - [x] Render shapes
+    - [ ] Input buffer  
 - [ ] More stuff to come  
 - [ ] Area Calculator
